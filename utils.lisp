@@ -345,3 +345,18 @@ class names)."
              (return-from ,find class)))
          (setf (gethash name ,map) class))
        ',class)))
+
+(defun get-session-bus-address-from-file (file)
+  (let ((variable-name "DBUS_SESSION_BUS_ADDRESS="))
+    (with-open-file (stream file :direction :input)
+      (do ((line (read-line stream) (read-line stream nil 'eof)))
+	  ((eq line 'eof) "")
+	(when (string-equal (subseq line 0 (length variable-name))
+			    variable-name)
+	  (return (subseq line (length variable-name))))))))
+
+(defun update-environment-variables ()
+  "Sets the 'DBUS_SESSION_BUS_ADDRESS' environment variable (if not present)."
+  (when (not (getenv "DBUS_SESSION_BUS_ADDRESS"))
+      (let ((filename (car (cl-fad:list-directory ".dbus/session-bus/"))))
+	(iolib.syscalls:setenv "DBUS_SESSION_BUS_ADDRESS" (get-session-bus-address-from-file filename) t))))

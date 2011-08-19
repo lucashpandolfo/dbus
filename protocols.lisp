@@ -70,6 +70,12 @@ these messages no longer pending."))
 (defgeneric close-connection (connection)
   (:documentation "Close an open connection."))
 
+(defgeneric wait-for-incoming-message (connection message-types &optional serial)
+  (:documentation "Waits for an incoming message in the given
+  connection. The message to be received is one of the types in the
+  message-types list. If a serial is given, the message must also have
+  the same serial."))
+
 (defgeneric wait-for-reply (serial connection)
   (:documentation "Wait for a reply message with the supplied serial
 to be received via connection."))

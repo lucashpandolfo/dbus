@@ -40,20 +40,28 @@
   (prog1 (nreverse (connection-pending-messages connection))
     (setf (connection-pending-messages connection) '())))
 
-(defmethod wait-for-reply (serial (connection standard-connection))
-  (let ((reply nil))
-    (flet ((reply-p (message)
-             (when (and (typep message '(or error-message method-return-message))
-                        (= serial (message-reply-serial message)))
-               (setf reply message))))
+(defmethod wait-for-incoming-message ((connection standard-connection) message-types &optional (serial nil))
+  (let ((incoming nil))
+    (flet ((wanted-p (message)
+             (when (and (loop for type in message-types
+			   do (when (typep message type)
+				(return t))
+			     'nil)
+			(or (not serial)
+			    (= serial (message-reply-serial message))))
+               (setf incoming message))))
       (with-accessors ((pending-messages connection-pending-messages)) connection
-        (setf pending-messages (delete-if (lambda (message) (reply-p message)) pending-messages))
-        (unless reply
+        (setf pending-messages (delete-if (lambda (message) (wanted-p message)) pending-messages))
+        (unless incoming
           (loop
-           (event-dispatch (connection-event-base connection) :one-shot t)
-           (when (reply-p (first pending-messages))
-             (pop pending-messages)
-             (return))))))
+	     (event-dispatch (connection-event-base connection) :one-shot t)
+	     (when (wanted-p (first pending-messages))
+	       (pop pending-messages)
+	       (return))))))
+    incoming))
+
+(defmethod wait-for-reply (serial (connection standard-connection))
+  (let ((reply (wait-for-incoming-message connection '(error-message method-return-message) serial)))
     (values (message-body reply) reply)))
 
 (defun activate-io-handlers (connection)

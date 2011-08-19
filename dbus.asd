@@ -8,7 +8,7 @@
 
 (asdf:defsystem #:dbus
   :depends-on (#:alexandria #:babel #:cl-xmlspam #:flexi-streams
-               #:iolib #:ironclad #:split-sequence)
+               #:iolib #:ironclad #:split-sequence #:cl-fad)
   :serial t
   :components
   ((:file "packages")
