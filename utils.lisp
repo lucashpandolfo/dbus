@@ -355,8 +355,27 @@ class names)."
 			    variable-name)
 	  (return (subseq line (length variable-name))))))))
 
+(defun get-machine-id ()
+  (with-open-file (machine-id-file "/var/lib/dbus/machine-id" 
+				   :direction :input)
+    (read-line machine-id-file)))
+
+(defun get-display-number ()
+  (let ((display (getenv "DISPLAY")))
+    (if (null display)
+	(error "DISPLAY variable not set.")
+	(handler-case
+	    (parse-integer (subseq display (1+ (position #\: display)) (position #\. display)))
+	  (parse-error () (error "Can not parse DISPLAY variable."))))))
+
 (defun update-environment-variables ()
   "Sets the 'DBUS_SESSION_BUS_ADDRESS' environment variable (if not present)."
   (when (not (getenv "DBUS_SESSION_BUS_ADDRESS"))
-      (let ((filename (car (cl-fad:list-directory ".dbus/session-bus/"))))
-	(iolib.syscalls:setenv "DBUS_SESSION_BUS_ADDRESS" (get-session-bus-address-from-file filename) t))))
+    (let (machine-id display)
+      (setq machine-id (get-machine-id))
+      (setq display (format nil "~d" (get-display-number)))
+      (iolib.syscalls:setenv 
+       "DBUS_SESSION_BUS_ADDRESS" 
+       (get-session-bus-address-from-file 
+	(concatenate 'string "~/.dbus/session-bus/" machine-id "-" display))
+       t))))
