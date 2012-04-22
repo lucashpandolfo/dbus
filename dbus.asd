@@ -8,11 +8,12 @@
 
 (asdf:defsystem #:dbus
   :depends-on (#:alexandria #:babel #:cl-xmlspam #:flexi-streams
-               #:iolib #:ironclad #:split-sequence)
+               #:iolib #:ironclad #:split-sequence #-sbcl #:ieee-floats)
   :serial t
   :components
   ((:file "packages")
    #+sbcl (:file "dbus-sbcl")
+   #-sbcl (:file "dbus-ccl")
    (:file "utils")
    (:file "protocols")
    (:file "conditions")
