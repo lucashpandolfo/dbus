@@ -379,3 +379,15 @@ class names)."
        (get-session-bus-address-from-file 
 	(concatenate 'string "~/.dbus/session-bus/" machine-id "-" display))
        t))))
+
+(defun string->keyword (str)
+  (intern str "KEYWORD"))
+
+(defun split-string (delimiter str)
+  (split-sequence delimiter str :test #'string=))
+
+(defun available-multiplexers ()
+  "returns an alist of available multiplexers"
+  (loop for (nil . mux) in *available-multiplexers* 
+        collect (cons (string->keyword (car (split-string "-" (symbol-name mux))))
+                      mux)))

@@ -16,6 +16,7 @@
   (:import-from #:babel #:string-to-octets #:octets-to-string)
   (:import-from #:ironclad #:digest-sequence)
   (:import-from #:iolib
+                #:*available-multiplexers*
                 #:event-dispatch #:set-io-handler #:make-socket
                 #:connect #:fd-of #:with-event-base
                 #:ensure-address)
@@ -27,6 +28,7 @@
   (:shadow #:method #:make-method)
   (:export
    ;; Utilities
+   #:available-multiplexers
    #:inexistent-entry
    #:inexistent-entry-designator
    #:entry-replacement-attempt

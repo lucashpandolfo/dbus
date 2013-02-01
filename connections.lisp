@@ -54,7 +54,7 @@
         (setf pending-messages (delete-if (lambda (message) (wanted-p message)) pending-messages))
         (unless incoming
           (loop
-	     (event-dispatch (connection-event-base connection) :one-shot t)
+	     (event-dispatch (connection-event-base connection) :one-shot t :max-step 100)
 	     (when (wanted-p (first pending-messages))
 	       (pop pending-messages)
 	       (return))))))

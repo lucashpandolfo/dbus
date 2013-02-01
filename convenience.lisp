@@ -22,10 +22,11 @@
     (authenticate (supported-authentication-mechanisms connection) connection)
     (funcall function (make-instance 'bus :name (hello connection) :connection connection))))
 
-(defmacro with-open-bus ((bus-var server-addresses &key event-base) &body forms)
+(defmacro with-open-bus ((bus-var server-addresses &key event-base multiplexer) &body forms)
   (if (null event-base)
       (with-gensyms (event-base)
-        `(with-event-base (,event-base)
+        `(with-event-base (,event-base :mux ',(cdr (assoc (or multiplexer :select)
+                                                          (available-multiplexers))))
            (with-open-bus (,bus-var ,server-addresses :event-base ,event-base)
              ,@forms)))
       (once-only (server-addresses event-base)
