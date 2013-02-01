@@ -355,7 +355,7 @@ class names)."
 			    variable-name)
 	  (return (subseq line (length variable-name))))))))
 
-(defun get-machine-id ()
+(defun get-machine-id-from-filesystem ()
   (with-open-file (machine-id-file "/var/lib/dbus/machine-id" 
 				   :direction :input)
     (read-line machine-id-file)))
@@ -372,7 +372,7 @@ class names)."
   "Sets the 'DBUS_SESSION_BUS_ADDRESS' environment variable (if not present)."
   (when (not (getenv "DBUS_SESSION_BUS_ADDRESS"))
     (let (machine-id display)
-      (setq machine-id (get-machine-id))
+      (setq machine-id (get-machine-id-from-filesystem))
       (setq display (format nil "~d" (get-display-number)))
       (iolib.syscalls:setenv 
        "DBUS_SESSION_BUS_ADDRESS" 
