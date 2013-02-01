@@ -34,6 +34,7 @@
    #:entry-replacement-attempt
    #:entry-replacement-attempt-old
    #:entry-replacement-attempt-new
+   #:update-environment-variables
    ;; Server address protocol
    #:server-address
    #:server-address-transport-name
